@@ -22,3 +22,9 @@ header .brand{display:inline-flex;align-items:center;min-height:44px}
 .composition-entry{margin:14px 0 22px;font-size:12px;line-height:1.9}.composition-entry a{display:inline-block;min-height:44px;line-height:44px;color:#ddd}.composition-entry span{display:block;color:#aaa;font-size:11px}
 
 .cell-use{display:block;font:11px/1.5 Arial,'Noto Sans CJK JP','Yu Gothic',sans-serif;color:var(--muted);letter-spacing:0;margin-top:3px}
+
+/* Loop controls stay reachable without covering the previews. */
+.playback-controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+#loop-toggle{border-color:#777;color:var(--ink)}
+#loop-toggle[aria-pressed=true]{border-color:var(--yellow);color:var(--yellow)}
+@media(max-width:640px){.tools{flex-wrap:wrap}.hint{max-width:none}.playback-controls{width:100%;justify-content:flex-start}.playback-controls .toggle{font-size:11px;padding:8px 12px}}
