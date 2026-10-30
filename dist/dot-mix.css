@@ -1,0 +1,20 @@
+/* Scope all play styling to the optional DOT MIX section. */
+.dot-mix:not([data-mix-ready]){display:none}
+.dot-mix{padding:36px 0;border-block:1px solid var(--line,#33362c);margin:20px 0 0;color:var(--ink,#f1f1e8)}
+.dot-mix h2{font-size:clamp(24px,3vw,36px);font-weight:500;letter-spacing:-.03em;margin:10px 0}
+.dot-mix p{font-size:13px;line-height:1.9;color:var(--muted,#b2b3a8)}
+.dot-mix-board{display:block;width:100%;padding:0;overflow:hidden;border:1px solid var(--line,#33362c);border-radius:12px;background:var(--surface,#141510);color:var(--ink,#f1f1e8);cursor:pointer;touch-action:manipulation;margin:24px 0 16px}
+.dot-mix-board svg{display:block;width:100%;height:auto;max-height:300px;aspect-ratio:480/260;pointer-events:none}
+.dot-mix .mix-dot{fill:currentColor}.dot-mix .mix-dot-accent{fill:var(--accent-text,#fc0)}
+.dot-mix-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dot-mix button:not(.dot-mix-board){min-height:44px;padding:9px 16px;border:1px solid var(--line,#33362c);border-radius:5px;background:var(--surface,#141510);color:inherit;font:inherit;font-size:12px;cursor:pointer;touch-action:manipulation}
+.dot-mix button[data-mix-shape][aria-pressed=true]{background:var(--accent,#fc0);border-color:var(--accent,#fc0);color:#171910}
+.dot-mix button[data-mix-motion]{margin-left:auto;color:var(--muted,#b2b3a8)}
+.dot-mix button:disabled{cursor:default;opacity:.8}
+.dot-mix button:focus-visible{outline:2px solid var(--accent-text,#fc0);outline-offset:5px}
+.dot-mix button:enabled:hover{border-color:var(--accent-text,#fc0)}
+.dot-mix [data-mix-status]{display:block;min-height:2.5em;font:11px/1.8 monospace;color:var(--muted,#b2b3a8);margin-top:14px}
+.dot-mix[data-mix-motion=off] button{transition:none}
+@media(max-width:480px){.dot-mix{padding:28px 0}.dot-mix button:not(.dot-mix-board){padding-inline:12px}.dot-mix button[data-mix-motion]{margin-left:0}.dot-mix [data-mix-status]{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.dot-mix button{transition:none}}
+@media(forced-colors:active){.dot-mix .mix-dot,.dot-mix .mix-dot-accent{fill:ButtonText}.dot-mix button[data-mix-shape][aria-pressed=true]{border:3px solid Highlight}}

@@ -1,0 +1,5 @@
+/* Shared tactile feedback for collection controls; never move their hit areas. */
+button:not(.cell){transition:border-color 180ms ease-out,background-color 180ms ease-out,filter 220ms cubic-bezier(.16,1,.3,1)}
+button:not(.cell):enabled:active{filter:brightness(.86);transition-duration:65ms}
+body:has(#motion-toggle[aria-pressed="false"]) button{transition:none}
+@media(prefers-reduced-motion:reduce){button:not(.cell){transition:none}}

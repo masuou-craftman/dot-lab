@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DOTLAB — Contour / 01</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#000;color:#f0f0f0;font:14px 'Courier New',monospace}main{max-width:1280px;margin:0 auto}canvas{display:block;width:100%;height:auto;aspect-ratio:16/9}section{padding:18px 24px;border-top:1px solid #333;display:flex;gap:12px;align-items:center;flex-wrap:wrap}button{font:inherit;background:#111;color:#f0f0f0;border:1px solid #383838;border-radius:7px;min-height:44px;padding:8px 16px;cursor:pointer}button:hover{border-color:#aaa}button:focus-visible,input:focus-visible{outline:2px solid #ffcc00;outline-offset:4px}button:disabled,input:disabled{opacity:.5;cursor:default}input{accent-color:#ffcc00;flex:1;min-width:100px;min-height:44px}output{min-width:100px;font-variant-numeric:tabular-nums}p{padding:0 24px 20px;color:#aaa;font-size:12px;line-height:1.6;margin:0}
+</style>
+<style>.easing-compare{position:relative;z-index:1;width:max-content;margin:12px 12px 12px auto;display:flex;flex-wrap:wrap;gap:12px;padding:10px 14px;border:1px solid #666;border-radius:8px;background:#111e;color:#eee;font:12px/1.6 Arial,sans-serif;max-width:calc(100vw - 24px);box-sizing:border-box}.easing-compare a{color:#eee;text-decoration:underline;text-underline-offset:3px}.easing-compare a:focus-visible{outline:2px solid #fc0;outline-offset:3px}.easing-compare strong{color:#fc0;font-weight:400}</style><aside class="easing-compare" aria-label="イージング比較"><strong>緩急 02</strong><a href="../original/stroke-shape/index.html">元の動き</a><a href="../index.html">10点の一覧</a></aside><main><canvas id="scene" width="2560" height="1440" role="img" aria-label="A continuous white contour opens from a square into a line, folds through an arch, and resolves as a diamond. A short yellow endpoint marks its ownership."></canvas>
+<section aria-label="Playback controls"><button id="replay">Replay</button><button id="toggle">Play</button><label for="seek">Time</label><input id="seek" type="range" min="0" max="6.4" step="0.01" value="0"><output id="time" for="seek">0.00 / 6.40</output></section>
+<p id="note">Stronger easing: restrained start, decisive sweep, soft landing. Same 6.4-second timeline; the encoded video shows the original easing. Manual playback; no automatic loop. Offline Canvas replay, not an After Effects project.</p></main>
+<script>
+'use strict';
+// GEOMETRY START — original geometry, revised temporal easing
+const DURATION=6.4;
+function smooth(x){x=Math.max(0,Math.min(1,x));const a=x**4,b=(1-x)**4;return a/(a+b)}
+function pose(t){
+ let a,stage;
+ if(t<.65){a=[-90,0,90,180];stage='01 / ENCLOSE'}
+ else if(t<2.25){let u=smooth((t-.65)/1.6);a=[-90,0,90,180].map(v=>v*(1-u));stage='02 / RELEASE'}
+ else if(t<2.75){a=[0,0,0,0];stage='02 / RELEASE'}
+ else if(t<3.65){let u=smooth((t-2.75)/.9);a=[-67.5,-22.5,22.5,67.5].map(v=>v*u);stage='03 / FOLD'}
+ else if(t<3.95){a=[-67.5,-22.5,22.5,67.5];stage='03 / FOLD'}
+ else if(t<4.95){let u=smooth(t-3.95);a=[-67.5,-22.5,22.5,67.5].map(v=>v*(1+u));stage='03 / FOLD'}
+ else{a=[-135,-45,45,135];stage='04 / RESOLVE'}
+ let p=[[0,0]];for(const angle of a){let r=angle*Math.PI/180,q=p[p.length-1];p.push([q[0]+Math.cos(r)*270,q[1]+Math.sin(r)*270])}
+ let xs=p.map(q=>q[0]),ys=p.map(q=>q[1]),cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;
+ return {points:p.map(q=>[q[0]+640-cx,q[1]+369-cy]),stage};
+}
+// GEOMETRY END
+const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
+const replay=document.getElementById('replay'),toggle=document.getElementById('toggle'),seek=document.getElementById('seek'),time=document.getElementById('time'),note=document.getElementById('note');
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+let t=0,playing=false,origin=0,raf=0;
+function draw(){
+ ctx.setTransform(2,0,0,2,0,0);ctx.fillStyle='#000';ctx.fillRect(0,0,1280,720);
+ const text=(x,y,s,color='#aaa',size=16)=>{ctx.fillStyle=color;ctx.font=`${size}px 'Liberation Mono','Courier New',monospace`;ctx.textBaseline='top';ctx.fillText(s,x,y)};
+ text(54,40,'DOTLAB / MOTION STUDIES','#f0f0f0',17);text(54,70,'CONTOUR  /  01','#aaa',13);text(995,40,'ONE CONTINUOUS LINE','#aaa',13);
+ const {points:p,stage}=pose(t);ctx.strokeStyle='#f0f0f0';ctx.lineWidth=24;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(...q):ctx.moveTo(...q));ctx.stroke();
+ const start=p[0],tip=[start[0]+(p[1][0]-start[0])*32/270,start[1]+(p[1][1]-start[1])*32/270];
+ ctx.strokeStyle='#ffcc00';ctx.lineCap='butt';ctx.beginPath();ctx.moveTo(...start);ctx.lineTo(...tip);ctx.stroke();ctx.fillStyle='#ffcc00';ctx.beginPath();ctx.arc(...start,12,0,Math.PI*2);ctx.fill();
+ text(54,642,'ENCLOSE  /  RELEASE  /  FOLD','#f0f0f0',15);text(1045,642,stage,'#aaa',13);
+ seek.value=t;time.value=`${t.toFixed(2)} / 6.40`;toggle.textContent=playing?'Pause':'Play';
+}
+function stop(){playing=false;cancelAnimationFrame(raf);draw()}
+function tick(now){if(!playing)return;t=Math.min(DURATION,(now-origin)/1000);if(t>=DURATION)playing=false;draw();if(playing)raf=requestAnimationFrame(tick)}
+function play(fromStart=false){if(reduced.matches)return;if(fromStart||t>=DURATION)t=0;cancelAnimationFrame(raf);playing=true;origin=performance.now()-t*1000;draw();raf=requestAnimationFrame(tick)}
+replay.addEventListener('click',()=>play(true));toggle.addEventListener('click',()=>playing?stop():play());
+seek.addEventListener('input',()=>{const next=Number(seek.value);stop();t=next;draw()});
+// Preserve a paused frame while hidden; no unseen timeline jump on return.
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing)stop()});
+function preference(){stop();if(reduced.matches)t=DURATION;replay.disabled=toggle.disabled=seek.disabled=reduced.matches;note.textContent=reduced.matches?'Reduced motion: static final pose. Playback and seeking are disabled.':'Stronger easing: restrained start, decisive sweep, soft landing. Same 6.4-second timeline; the encoded video shows the original easing. Manual playback; no automatic loop. Offline Canvas replay, not an After Effects project.';draw()}
+reduced.addEventListener('change',preference);preference();
+</script></html>

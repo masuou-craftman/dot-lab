@@ -1,0 +1,1 @@
+const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');for(const file of fs.readdirSync(__dirname).filter(f=>f.endsWith('.cjs')&&f!=='run-all.cjs')){console.log('\n## '+file);cp.execFileSync(process.execPath,[path.join(__dirname,file)],{stdio:'inherit'});}

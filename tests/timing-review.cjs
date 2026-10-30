@@ -1,0 +1,16 @@
+// Node VM unit simulation; not a browser.
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const html=fs.readFileSync(require('node:path').join(__dirname,'../dist/motion-timing.html'),'utf8');const code=html.match(/<script>([\s\S]*?)<\/script>/)[1];const ids={},events={},docEvents={};let now=0,serial=0,frames=new Map();
+for(const [,id] of html.matchAll(/\bid="([^"]+)"/g))ids[id]={style:{},attrs:{},events:{},disabled:false,addEventListener(k,f){this.events[k]=f},setAttribute(k,v){this.attrs[k]=v},focus(){document.activeElement=this},dispatch(k,value){if(k==='click'&&this.disabled)return;this.events[k]?.({target:{value}})}};
+const document={hidden:false,querySelector:s=>ids[s.slice(1)],documentElement:{classList:{add(){}}},addEventListener(k,f){docEvents[k]=f}};const context={document,matchMedia:()=>({matches:false,addEventListener(){}}),localStorage:{getItem(){return null},setItem(){}},performance:{now:()=>now},requestAnimationFrame(f){frames.set(++serial,f);return serial},cancelAnimationFrame(id){frames.delete(id)},addEventListener(k,f){events[k]=f}};
+vm.runInNewContext(code,context);let passed=0,failed=0;function test(name,f){try{f();passed++;console.log('PASS',name)}catch(e){failed++;console.log('FAIL',name,e.message)}}
+const math={};vm.runInNewContext(code.split('// MATH BEGIN')[1].split('// MATH END')[0]+';this.f=curveProgress;this.b=bezierCoordinate',math);
+test('inverse Bezier matches independently parameterized coordinates over four curves',()=>{for(const p of [[.76,0,.16,1],[0,0,.58,1],[.16,1,.3,1],[0,0,1,1]])for(let i=0;i<=1000;i++){const u=i/1000,x=math.b(u,p[0],p[2]),y=math.b(u,p[1],p[3]);assert.ok(Math.abs(math.f(x,p)-y)<1e-9)}});
+test('play completes both tracks at same endpoint and finite frame queue',()=>{ids.play.dispatch('click');now=600;for(const [id,f] of [...frames]){frames.delete(id);f(now)}assert.equal(ids['linear-value'].textContent,'100.0 %');assert.equal(ids['selected-value'].textContent,'100.0 %');assert.equal(frames.size,0)});
+test('reset updates play button wording to initial state',()=>{ids.reset.dispatch('click');assert.equal(ids.play.textContent,'一度だけ再生 ▶')});
+test('scrub updates play button wording to continuation',()=>{ids.progress.dispatch('input','500');assert.equal(ids.play.textContent,'続きから再生 ▶')});
+test('storage ON clears stale OFF instruction without autoplay',()=>{events.storage({key:'dotlab-motion-enabled',newValue:'false'});assert.equal(ids.play.disabled,true);events.storage({key:'dotlab-motion-enabled',newValue:'true'});assert.equal(ids.play.disabled,false);assert.ok(!ids.status.textContent.includes('OFF'));assert.equal(frames.size,0)});
+
+test('stale first frame cannot move replay before start',()=>{now=1000;ids.replay.dispatch('click');for(const[id,f]of[...frames]){frames.delete(id);f(998)}assert.equal(ids['linear-value'].textContent,'0.0 %');ids.play.dispatch('click')});
+test('stale first frame cannot move resumed progress backward',()=>{ids.progress.dispatch('input','500');now=2000;ids.play.dispatch('click');for(const[id,f]of[...frames]){frames.delete(id);f(1998)}assert.equal(ids['linear-value'].textContent,'50.0 %');ids.play.dispatch('click')});
+console.log({kind:'Node VM simulation, not browser',passed,failed});process.exitCode=failed?1:0;
