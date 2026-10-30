@@ -2,7 +2,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const source=process.argv[2]||require('node:path').join(__dirname,'../dist/motion-table.js');
 const code=fs.readFileSync(source,'utf8');
-const tableHTML=fs.readFileSync(require('node:path').join(require('node:path').dirname(source),'motion-table.html'),'utf8');const externalScripts=[...tableHTML.matchAll(/<script\s+src="([^"]+)"[^>]*>/g)].map(m=>m[1]);assert(externalScripts.indexOf('heading-model.js')>=0&&externalScripts.indexOf('heading-model.js')<externalScripts.indexOf('motion-table.js'),'HTML loads heading model before table controller');
+const tableHTML=fs.readFileSync(require('node:path').join(require('node:path').dirname(source),'motion-table.html'),'utf8');const externalScripts=[...tableHTML.matchAll(/<script\s+src="([^"]+)"[^>]*>/g)].map(m=>m[1].split('?')[0]);assert(externalScripts.indexOf('heading-model.js')>=0&&externalScripts.indexOf('heading-model.js')<externalScripts.indexOf('motion-table.js'),'HTML loads heading model before table controller');
 const slugs=['shared-image','filter-grid','process-path','action-feedback','dot-response','selection-ripple','reading-position','type-motion','stroke-shape','matte-depth','disclosure','direction','reading-focus','heading'];
 const symbols=['Si','Fg','Pp','Af','Dr','Sr','Rp','Ty','Ct','Md','Ds','Dn','Fa','He'];
 function setup({hash='',reduced=false,stored,storageThrows=false,observer=true}={}){
