@@ -1071,7 +1071,7 @@ html[data-site-design=dot-lab][data-lab-motion=on][data-lab-easing=on] .dot-play
 <div class="site-shell">
 <header class="site-header">
 <a class="site-name" href="#home" data-route="home"><span class="liquid-mark" data-liquid="brand" aria-hidden="true"></span><span>DOT LAB<span class="site-name-sub">MOTION & PLAY</span></span></a>
-<nav aria-label="ページを選ぶ"><a href="#blog" data-route="blog">ブログ</a><a href="#works" data-route="works">制作物</a><a href="#profile" data-route="profile">自己紹介</a><a href="#links" data-route="links">活動先</a></nav>
+<nav aria-label="ページを選ぶ"><a href="#blog" data-route="blog">ブログ</a><a href="#works" data-route="works">制作物</a><a href="#profile" data-route="profile">DOT LABについて</a><a href="#links" data-route="links">リンク</a></nav>
 <button id="theme-button" class="theme-button" type="button" aria-label="明るい表示に切り替える" aria-pressed="true"><span class="theme-symbol" aria-hidden="true"></span></button>
 </header>
 <main id="main" tabindex="-1"></main>
@@ -1122,9 +1122,9 @@ html[data-site-design=dot-lab][data-lab-motion=on][data-lab-easing=on] .dot-play
 </section>
 <section class="directory" aria-labelledby="directory-heading">
 <div class="section-heading dot-section-heading"><span class="dot-section-index" data-dot-scene="type" data-dot-text="02" aria-hidden="true"></span><div><span class="dot-section-label">INDEX</span><h2 id="directory-heading">この場所について</h2></div></div>
-<a class="directory-entry home-entry" id="home-profile" href="#profile" data-route="profile"><span class="entry-symbol" data-dot-scene="profile" aria-hidden="true"></span><div><h3>DOT LABについて</h3><p>この場所と、つくっている人。</p></div><span class="entry-arrow" aria-hidden="true">↗</span></a>
+<a class="directory-entry home-entry" id="home-profile" href="#profile" data-route="profile"><span class="entry-symbol" data-dot-scene="profile" aria-hidden="true"></span><div><h3>DOT LABについて</h3><p>動きと触り心地を試す、この場所について。</p></div><span class="entry-arrow" aria-hidden="true">↗</span></a>
 <a class="directory-entry home-entry" id="home-works" href="#works" data-route="works"><span class="entry-symbol" data-dot-scene="works" aria-hidden="true"></span><div><h3>つくったもの</h3><p>モーションエフェクト周期表。<span class="preparing">14 STUDIES</span></p></div><span class="entry-arrow" aria-hidden="true">↗</span></a>
-<a class="directory-entry home-entry" id="home-links" href="#links" data-route="links"><span class="entry-symbol" data-dot-scene="links" aria-hidden="true"></span><div><h3>活動先</h3><p>ほかの場所へつながる入口。<span class="preparing">準備中</span></p></div><span class="entry-arrow" aria-hidden="true">↗</span></a>
+<a class="directory-entry home-entry" id="home-links" href="#links" data-route="links"><span class="entry-symbol" data-dot-scene="links" aria-hidden="true"></span><div><h3>リンク</h3><p>作品に関連する資料への入口。<span class="preparing">準備中</span></p></div><span class="entry-arrow" aria-hidden="true">↗</span></a>
 </section>
 </div>
 </template>
@@ -7799,28 +7799,28 @@ void main() {
   function reply(question='',page=''){
     const text=String(question).normalize('NFKC').trim().toLowerCase();
     if(/(?:ai|人工知能|チャットgpt|chatgpt|本物|接続|誰と|だれと)/u.test(text))return {
-      message:'今は、AIに接続せず、このサイトに用意した案内文で答える「サイト案内」です。制作物、ブログ、自己紹介の場所を案内できます。',
-      links:[link('ブログへ','blog'),link('自己紹介へ','profile')]
+      message:'今は、AIに接続せず、このサイトに用意した案内文で答える「サイト案内」です。制作物、ブログ、DOT LABの紹介ページを案内できます。',
+      links:[link('ブログへ','blog'),link('DOT LABについて','profile')]
     };
     if(/(?:作品|制作|作った|つくった|ポートフォリオ|works|周期表|モーション|イージング|緩急|four\s*edges|組み合わせ)/u.test(text))return {
       message:'「モーションエフェクト周期表」に14の習作を並べています。緩急の実験台では、同じ距離・時間で進み方を比較できます。別作品の「FOUR EDGES」は、4本の線を組み合わせた9.6秒の習作です。どちらも制作物のページから開けます。',
       links:[link('制作物へ','works')]
     };
     if(/(?:遊|あそ|丸|まる|親玉|ドット|仕掛|しかけ|動き|アニメ|精霊|ぽよ)/u.test(text))return {
-      message:'ホームのドットは、アイコン・まる・面の順に自動で形を変えます。「一時停止」で好きな形を眺めたり、図形をなぞったり「波を送る」を押したりしてみて。最初の形は作者のロゴ。右下の丸は、起動画面からついてくる案内役です。',
+      message:'ホームのドットは、アイコン・まる・面の順に自動で形を変えます。「一時停止」で好きな形を眺めたり、図形をなぞったり「波を送る」を押したりしてみて。最初の形はDOT LABのマーク。右下の丸は、起動画面からついてくる案内役です。',
       links:[link('ホームで遊ぶ','home')]
     };
     if(/(?:ブログ|記事|記録|読|よみ|日記|ノート|最新)/u.test(text))return {
-      message:'ブログは魔巣王本人の記録です。今は「触れる楽しさを、かたちにする」という表示確認用のサンプル記事が読めます。制作ノートの見本としてご覧ください。',
+      message:'ブログはDOT LABの制作ノートです。今は「触れる楽しさを、かたちにする」という表示確認用のサンプル記事が読めます。制作ノートの見本としてご覧ください。',
       links:[link('サンプル記事を読む','post/first-note'),link('ブログ一覧へ','blog')]
     };
     if(/(?:sns|x\b|twitter|youtube|連絡|リンク|活動先|アカウント)/u.test(text))return {
-      message:'活動先へのリンクは、まだ掲載準備中です。公開されたリンクは「活動先」のページにまとまります。ここでは未掲載のアカウントや連絡先を推測して紹介することはできません。',
-      links:[link('活動先へ','links')]
+      message:'作品を探すときは「制作物」、動きを試すときは「モーションエフェクト周期表」へ。リンクページには、公開する関連資料をまとめていきます。',
+      links:[link('リンクへ','links')]
     };
-    if(/(?:マスオウ|魔巣王|ますおう|masuou|自己紹介|プロフィール|誰|だれ|キャラ|設定|住処|地下)/u.test(text))return {
-      message:'DOT LABは、動きや触り心地を試して遊ぶ実験の場所です。「魔巣王」は作者の活動名。「マスオウ」は、魔巣王が制作したキャラクターです。ブログを書くのは魔巣王本人。キャラクターの詳しい設定は、公開ページに載っている範囲で紹介していきます。',
-      links:[link('魔巣王について','profile')]
+    if(/(?:dot\s*lab|このサイト|自己紹介|プロフィール|作者|誰|だれ)/u.test(text))return {
+      message:'DOT LABは、点・線・動き・触り心地を試して遊ぶウェブの実験室です。モーションを見比べたり、緩急を自分で調整したり、ブラウザで作品を体験できます。',
+      links:[link('DOT LABについて','profile')]
     };
     if(/(?:暗|明る|色|テーマ|ダーク|ライト)/u.test(text))return {
       message:'ページ上部の、半分だけ塗られた丸いボタンで明るい表示と暗い表示を切り替えられます。選んだ表示は、同じブラウザーで次に開いたときにも引き継ぎます。',
@@ -7831,14 +7831,14 @@ void main() {
     };
     if(/(?:こんにちは|こんばんは|おはよう|はじめまして|よろしく|やっほ)/u.test(text))return {
       message:'こんにちは。DOT LABへようこそ。動きの周期表や緩急エディターで、気になる動きを試してみて。',
-      links:[link('ブログを読む','blog'),link('自己紹介を見る','profile')]
+      links:[link('ブログを読む','blog'),link('DOT LABについて','profile')]
     };
     const article=String(page).replace(/^#/,'')==='post/first-note';
     return {
       message:article
-        ?'いま開いているのは、触れる楽しさをテーマにしたサンプル記事です。ほかにはブログの一覧や、魔巣王の自己紹介も案内できます。'
-        :'今はサイト案内として、このサイトに用意した案内文で答えています。「ブログを読みたい」「魔巣王って？」「ドットで遊びたい」など、気になることを聞いてみて。',
-      links:[link('ブログへ','blog'),link('自己紹介へ','profile')]
+        ?'いま開いているのは、触れる楽しさをテーマにしたサンプル記事です。ほかにはブログの一覧や、DOT LABの紹介も案内できます。'
+        :'今はサイト案内として、このサイトに用意した案内文で答えています。「ブログを読みたい」「DOT LABって？」「ドットで遊びたい」など、気になることを聞いてみて。',
+      links:[link('ブログへ','blog'),link('DOT LABについて','profile')]
     };
   }
   window.MasuouAssistantGuide=Object.freeze({reply});
@@ -7886,7 +7886,7 @@ void main() {
     welcome.append(welcomeTitle,welcomeDescription);
     const log=node('div','assistant-log');log.setAttribute('role','log');log.setAttribute('aria-label','アシスタントとの会話');log.setAttribute('aria-live','polite');log.setAttribute('aria-relevant','additions');
     const suggestions=node('div','assistant-suggestions');suggestions.setAttribute('aria-label','質問の例');
-    for(const text of ['ブログを読みたい','魔巣王って？','この丸で遊びたい']){
+    for(const text of ['ブログを読みたい','DOT LABって？','この丸で遊びたい']){
       const button=node('button','assistant-suggestion',text);button.type='button';button.setAttribute('aria-label',text);
       button.addEventListener('click',()=>ask(text));suggestions.append(button);
     }
@@ -9562,8 +9562,8 @@ void main() {
   const pages={
     blog:{title:'ブログ',html:`${back}${pageHeading('journal','BLOG / MAKING NOTES','制作のノート。')}<p class="page-intro">動きや触り心地をつくる過程を、言葉でも。</p><a class="list-entry" href="#post/first-note" data-route="post/first-note"><span class="list-symbol" data-dot-scene="journal" aria-hidden="true"></span>${meta}<h2>${postTitle}</h2><p>触ってみる楽しさと、ゆっくり読める場所を。</p><span>記事を読む →</span></a><p class="sample-notice">表示と操作を確認するためのサンプル記事です。</p>`},
     works:{title:'つくったもの',html:`${back}${pageHeading('works','WORKS / ARCHIVE','つくったもの。')}<p class="page-intro">動きを眺める、触る、つくる。ブラウザで試せる作品を集めました。</p><a class="motion-work" href="motion-table.html" aria-label="モーションエフェクト周期表を開く"><div class="motion-work-art" aria-hidden="true"><span><small>01</small>Si</span><span><small>02</small>Fg</span><span><small>03</small>Pp</span><span><small>04</small>Af</span><span><small>05</small>Dr</span><span><small>06</small>Sr</span><span><small>07</small>Rp</span><span><small>08</small>Ty</span><span><small>09</small>Ct</span><span><small>10</small>Md</span><span><small>11</small>Ds</span><span><small>12</small>Dn</span><span><small>13</small>Fa</span><span><small>14</small>He</span></div><div class="motion-work-copy"><span class="motion-work-tag">001 / INTERACTIVE STUDY · 2026.10</span><h2>モーションエフェクト<br>周期表。</h2><p>ためる、走る、着地する。<br>14の習作を、役割ごとに並べた動きの標本。</p><span class="motion-work-open">触って、動きを試す <b aria-hidden="true">↗</b></span></div></a><a class="motion-work" href="four-edges.html" aria-label="組み合わせの習作 FOUR EDGESを開く"><div class="composition-work-art" aria-hidden="true"><i></i><i></i><i></i><i></i><b>DOT LAB</b></div><div class="motion-work-copy"><span class="motion-work-tag">002 / COMPOSITION STUDY · 9.6 SECONDS</span><h2>FOUR EDGES</h2><p>四辺から、余白へ。<br>同じ4本を追う、組み合わせの習作。</p><span class="motion-work-open">構成を見てみる <b aria-hidden="true">↗</b></span></div></a><p class="sample-notice">周期表は、DOT LABで制作した14の習作を収録した、育てていく選集です。網羅的な分類ではありません。周期表という構成の着想元と制作の範囲は、作品ページに記載しています。</p>`},
-    profile:{title:'DOT LABについて',html:`${back}${pageHeading('profile','ABOUT / DOT LAB','DOT LABについて。')}<div class="prose"><p>DOT LABは、点・線・動き・触り心地を試す、ウェブの実験室です。</p><p>同じ動きでも、速さや間の取り方で印象は変わります。小さな違いを眺めたり、自分で動かしたりしながら楽しめる作品を集めています。</p><h2>つくっている人</h2><p>作者の活動名は「魔巣王」。制作ノートには、本人が試したことや考えたことを残します。</p><h2>キャラクター「マスオウ」</h2><p>マスオウは、自分が制作したキャラクター。このサイトでは、活動や制作と合わせて、キャラクターに関することも紹介していきます。</p></div>`},
-    links:{title:'活動先',html:`${back}${pageHeading('links','LINKS / ELSEWHERE','活動先。')}<p class="page-intro">活動や作品へつながるリンク。</p><div class="empty"><strong>掲載準備中</strong><p>公開する活動先を整理して、ここにまとめます。</p></div>`},
+    profile:{title:'DOT LABについて',html:`${back}${pageHeading('profile','ABOUT / DOT LAB','DOT LABについて。')}<div class="prose"><p>DOT LABは、点・線・動き・触り心地を試す、ウェブの実験室です。</p><p>同じ動きでも、速さや間の取り方で印象は変わります。小さな違いを眺めたり、自分で動かしたりしながら楽しめる作品を集めています。</p><h2>眺める、触る、つくる</h2><p>モーション周期表では、動きの違いを一覧で比較。緩急エディターでは、グラフをつかんで自分だけのリズムを試せます。</p><h2>小さな実験を、少しずつ</h2><p>ブラウザで遊べる作品と、制作のノートを集めています。気になる動きから、自由に触ってみてください。</p></div>`},
+    links:{title:'リンク',html:`${back}${pageHeading('links','LINKS / ELSEWHERE','リンク。')}<p class="page-intro">作品や制作に関連するリンク。</p><div class="empty"><strong>掲載準備中</strong><p>作品に関連する公開資料を、ここにまとめていきます。</p></div>`},
     'post/first-note':{title:postTitle,html:`<a class="page-back" href="#blog" data-route="blog">← <span>記事一覧へ</span></a>${pageHeading('journal','BLOG / SAMPLE NOTE',postTitle)}${meta}<p class="sample-notice">表示確認用のサンプル記事です。正式な投稿ではありません。</p><div class="prose"><p>DOT LABは、動きを眺めるだけでなく、触って試せる場所です。点を動かす、速さを変える、もう一度再生する。そんな小さな操作から、動きの違いを楽しめるようにしています。</p><h2>読みやすく、少し楽しく</h2><p>気になる記事や作品を選んで、開いて、ゆっくり読む。その流れを素直につくりながら、文字やボタンの反応にも少しだけ遊びを加えていきます。</p><p>細かな仕掛けを考えることも、文章をひとつ残すことも、この場所を育てることのひとつです。</p><h2>少しずつ残していく</h2><p>試したことや、途中で考えたことも、完成したものと合わせて記録していく。後から見返したときに、つくったときの気持ちが分かるような場所にしたいと思っています。</p></div><a class="page-back" href="#blog" data-route="blog">← <span>記事一覧へ</span></a>`}
   };
   const THEME_KEY='masuou-dot-theme-v2';
