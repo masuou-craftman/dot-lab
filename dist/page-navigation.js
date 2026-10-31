@@ -1,6 +1,6 @@
 /* Progressive enhancement only: native navigation, history and link semantics stay intact.
  * https://developer.chrome.com/docs/web-platform/view-transitions/cross-document
- * One left-to-right pass of coarse dot columns; no edge color, flashing or dot DOM.
+ * One top-left to bottom-right pass of coarse dots; no edge color, flashing or dot DOM.
  * https://developer.chrome.com/docs/modern-web-guidance/guides/ui-behaviors/interactive-content-reveal
  * No click interception, network requests, overlays, timers or navigation delay. */
 (()=>{'use strict';
@@ -15,32 +15,35 @@
  window.DotPageNavigation=Object.freeze({motionOff});
  if(!window.CSS?.registerProperty||!CSS.supports('mask-composite','intersect')||!CSS.supports('selector(:active-view-transition-type(dot-page))')||!('onpageswap' in window)||!('onpagereveal' in window)||!document.startViewTransition)return;
  const style=document.createElement('style');style.dataset.dotPageNavigation='';
- // Around 100px per dot, including phones: only the advancing boundary changes.
- // The unchanged old snapshot stays behind the reveal; no white/black flash layer.
- const columns=Math.max(4,Math.min(16,Math.ceil(innerWidth/112)));
- const cell=innerWidth/columns, radius=Math.ceil(cell*Math.SQRT1_2)+2;
- // Completed radius is also the non-animated default, preventing collapse during teardown.
- // One continuous expansion: no held keyframe or abrupt release.
- const duration=360+(columns-1)*18, scope=':root:active-view-transition-type(dot-page)';
+ // Coarse dots open along diagonals from top left to bottom right.
+ // Bound the grid to 16 x 16; adjacent diagonals share one animated property.
+ const cell=Math.max(innerWidth/Math.max(4,Math.min(16,Math.ceil(innerWidth/112))),innerHeight/16);
+ const columns=Math.ceil(innerWidth/cell),rows=Math.ceil(innerHeight/cell);
+ const bands=columns+rows-1,radius=Math.ceil(cell*Math.SQRT1_2)+2;
+ // Completed radius is the default; from + backwards fill handles the opening.
+ const duration=540, scope=':root:active-view-transition-type(dot-page)';
  let css='@view-transition{navigation:auto}';
  const masks=[],sizes=[],positions=[],animations=[];
- for(let i=0;i<columns;i++){
-  css+=`@property --dot-column-${i}{syntax:"<length>";inherits:false;initial-value:${radius}px}`;
-  css+=`@keyframes dot-column-${i}{from{--dot-column-${i}:0px}to{--dot-column-${i}:${radius}px}}`;
-  masks.push(`radial-gradient(circle at ${i*cell+cell/2}px 50%,#000 var(--dot-column-${i}),transparent calc(var(--dot-column-${i}) + .7px))`);
-  sizes.push(`${innerWidth}px ${cell}px`);positions.push(`0px 0px`);
-  animations.push(`dot-column-${i} 360ms cubic-bezier(.25,.25,.45,1) ${i*18}ms both`);
+ for(let i=0;i<bands;i++){
+  css+=`@property --dot-band-${i}{syntax:"<length>";inherits:false;initial-value:${radius}px}`;
+  css+=`@keyframes dot-band-${i}{from{--dot-band-${i}:0px}to{--dot-band-${i}:${radius}px}}`;
+  animations.push(`dot-band-${i} 360ms cubic-bezier(.25,.25,.45,1) ${i*180/Math.max(1,bands-1)}ms both`);
+ }
+ for(let y=0;y<rows;y++)for(let x=0;x<columns;x++){
+  const band=x+y;
+  masks.push(`radial-gradient(circle at ${(x+.5)*cell}px ${(y+.5)*cell}px,#000 var(--dot-band-${band}),transparent calc(var(--dot-band-${band}) + .7px))`);
+  sizes.push(`${innerWidth}px ${innerHeight}px`);positions.push('0px 0px');
  }
  css+=['','-group(*)','-image-pair(*)','-old(*)','-new(*)'].map(x=>scope+'::view-transition'+x).join(',')+'{pointer-events:none}';
  css+=`${scope}::view-transition-group(root){animation-duration:${duration}ms;background:transparent}`;
  css+=`${scope}::view-transition-image-pair(root){background:transparent;isolation:isolate}`;
  css+=`${scope}::view-transition-old(root){display:block;animation:none;mix-blend-mode:normal}`;
- css+=`${scope}::view-transition-new(root){mix-blend-mode:normal;mask-image:${masks.join(',')};mask-size:${sizes.join(',')};mask-position:${positions.join(',')};mask-repeat:repeat-y;mask-composite:add;animation:${animations.join(',')}}`;
+ css+=`${scope}::view-transition-new(root){mix-blend-mode:normal;mask-image:${masks.join(',')};mask-size:${sizes.join(',')};mask-position:${positions.join(',')};mask-repeat:no-repeat;mask-composite:add;animation:${animations.join(',')}}`;
  css+='@media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-new(*),::view-transition-old(*),::view-transition-image-pair(*){animation:none!important}}';
  style.textContent=css;
  document.head.append(style);
- const initialWidth=innerWidth;
- function sync(){style.disabled=innerWidth!==initialWidth||motionOff();if(style.disabled)active?.skipTransition();}
+ const initialWidth=innerWidth,initialHeight=innerHeight;
+ function sync(){style.disabled=(innerWidth!==initialWidth||innerHeight!==initialHeight)||motionOff();if(style.disabled)active?.skipTransition();}
  function clear(){active?.skipTransition();active=null;point=null;root.style.removeProperty('--dot-page-x');root.style.removeProperty('--dot-page-y');}
  // Read only the final unmodified primary click. Never preventDefault or alter a URL.
  document.addEventListener('click',e=>{
@@ -54,7 +57,7 @@
  addEventListener('pageswap',e=>{
   if(!e.viewTransition)return;
   active=e.viewTransition;active.ready?.catch(()=>{});active.types?.add('dot-page');
-  const off=motionOff()||innerWidth!==initialWidth;if(off)active.skipTransition();
+  const off=motionOff()||(innerWidth!==initialWidth||innerHeight!==initialHeight);if(off)active.skipTransition();
   try{sessionStorage.setItem(key,JSON.stringify({url:e.activation?.entry?.url,point,off,time:Date.now()}));}catch{}
  });
  addEventListener('pagereveal',e=>{
@@ -62,7 +65,7 @@
   active=e.viewTransition;active.ready?.catch(()=>{});active.types?.add('dot-page');let saved=null;
   try{saved=JSON.parse(sessionStorage.getItem(key));sessionStorage.removeItem(key);}catch{}
   const valid=saved&&saved.url===location.href&&Date.now()-saved.time<15000;
-  if(motionOff()||innerWidth!==initialWidth||(valid&&saved.off)){active.skipTransition();return;}
+  if(motionOff()||(innerWidth!==initialWidth||innerHeight!==initialHeight)||(valid&&saved.off)){active.skipTransition();return;}
   const p=valid&&saved.point?.url===location.href?saved.point:null;
   root.style.setProperty('--dot-page-x',`${Math.max(0,Math.min(1,p?.x??.5))*100}vw`);
   root.style.setProperty('--dot-page-y',`${Math.max(0,Math.min(1,p?.y??.42))*100}vh`);
