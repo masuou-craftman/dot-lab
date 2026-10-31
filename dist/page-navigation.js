@@ -1,5 +1,7 @@
 /* Progressive enhancement only: native navigation, history and link semantics stay intact.
  * https://developer.chrome.com/docs/web-platform/view-transitions/cross-document
+ * Four staggered CSS dot-mask phases; no per-frame JS or dot DOM.
+ * https://developer.chrome.com/docs/modern-web-guidance/guides/ui-behaviors/interactive-content-reveal
  * No click interception, network requests, overlays, timers or navigation delay. */
 (()=>{'use strict';
  const root=document.documentElement, reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -11,15 +13,23 @@
   return !!document.querySelector('#motion[aria-checked="false"],#motion-toggle[aria-pressed="false"]');
  }
  window.DotPageNavigation=Object.freeze({motionOff});
- if(!('onpageswap' in window)||!('onpagereveal' in window)||!document.startViewTransition)return;
+ if(!window.CSS?.registerProperty||!CSS.supports('mask-composite','intersect')||!CSS.supports('selector(:active-view-transition-type(dot-page))')||!('onpageswap' in window)||!('onpagereveal' in window)||!document.startViewTransition)return;
  const style=document.createElement('style');style.dataset.dotPageNavigation='';
  style.textContent=`@view-transition{navigation:auto}
+ @property --dot-radius-0{syntax:"<length>";inherits:true;initial-value:0px}
+ @property --dot-radius-1{syntax:"<length>";inherits:true;initial-value:0px}
+ @property --dot-radius-2{syntax:"<length>";inherits:true;initial-value:0px}
+ @property --dot-radius-3{syntax:"<length>";inherits:true;initial-value:0px}
  :root:active-view-transition-type(dot-page)::view-transition, :root:active-view-transition-type(dot-page)::view-transition-group(*), :root:active-view-transition-type(dot-page)::view-transition-image-pair(*), :root:active-view-transition-type(dot-page)::view-transition-old(*), :root:active-view-transition-type(dot-page)::view-transition-new(*){pointer-events:none}
- :root:active-view-transition-type(dot-page)::view-transition-group(root){animation-duration:340ms}
- :root:active-view-transition-type(dot-page)::view-transition-old(root){display:block;animation:none;mix-blend-mode:normal}
- :root:active-view-transition-type(dot-page)::view-transition-new(root){mix-blend-mode:normal;animation:dot-page-open 340ms cubic-bezier(.76,0,.18,1) both}
- @keyframes dot-page-open{from{clip-path:circle(5px at var(--dot-page-x,50vw) var(--dot-page-y,42vh))}to{clip-path:circle(150vmax at var(--dot-page-x,50vw) var(--dot-page-y,42vh))}}
- @media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-new(*),::view-transition-old(*){animation:none!important}}`;
+ :root:active-view-transition-type(dot-page)::view-transition-group(root){animation-duration:465ms;background:#e5c54a}
+ :root:active-view-transition-type(dot-page)::view-transition-image-pair(root){background:#e5c54a;isolation:isolate;animation:dot-grid-0 360ms cubic-bezier(.76,0,.18,1) 0ms both,dot-grid-1 360ms cubic-bezier(.76,0,.18,1) 35ms both,dot-grid-2 360ms cubic-bezier(.76,0,.18,1) 70ms both,dot-grid-3 360ms cubic-bezier(.76,0,.18,1) 105ms both}
+ :root:active-view-transition-type(dot-page)::view-transition-old(root){display:block;animation:none;mix-blend-mode:normal;mask-image:radial-gradient(circle at 25% 25%,transparent var(--dot-radius-0),#000 calc(var(--dot-radius-0) + 1px)),radial-gradient(circle at 75% 25%,transparent var(--dot-radius-1),#000 calc(var(--dot-radius-1) + 1px)),radial-gradient(circle at 25% 75%,transparent var(--dot-radius-2),#000 calc(var(--dot-radius-2) + 1px)),radial-gradient(circle at 75% 75%,transparent var(--dot-radius-3),#000 calc(var(--dot-radius-3) + 1px));mask-size:96px 96px;mask-position:calc(var(--dot-page-x,50vw) - 24px) calc(var(--dot-page-y,42vh) - 24px);mask-composite:intersect}
+ :root:active-view-transition-type(dot-page)::view-transition-new(root){animation:none;mix-blend-mode:normal;mask-image:radial-gradient(circle at 25% 25%,#000 max(0px,calc(var(--dot-radius-0) - 2px)),transparent max(.1px,calc(var(--dot-radius-0) - 1px))),radial-gradient(circle at 75% 25%,#000 max(0px,calc(var(--dot-radius-1) - 2px)),transparent max(.1px,calc(var(--dot-radius-1) - 1px))),radial-gradient(circle at 25% 75%,#000 max(0px,calc(var(--dot-radius-2) - 2px)),transparent max(.1px,calc(var(--dot-radius-2) - 1px))),radial-gradient(circle at 75% 75%,#000 max(0px,calc(var(--dot-radius-3) - 2px)),transparent max(.1px,calc(var(--dot-radius-3) - 1px)));mask-size:96px 96px;mask-position:calc(var(--dot-page-x,50vw) - 24px) calc(var(--dot-page-y,42vh) - 24px);mask-composite:add}
+ @keyframes dot-grid-0{from{--dot-radius-0:0px}to{--dot-radius-0:37px}}
+ @keyframes dot-grid-1{from{--dot-radius-1:0px}to{--dot-radius-1:37px}}
+ @keyframes dot-grid-2{from{--dot-radius-2:0px}to{--dot-radius-2:37px}}
+ @keyframes dot-grid-3{from{--dot-radius-3:0px}to{--dot-radius-3:37px}}
+ @media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-new(*),::view-transition-old(*),::view-transition-image-pair(*){animation:none!important}}`;
  document.head.append(style);
  function sync(){style.disabled=motionOff();if(style.disabled)active?.skipTransition();}
  function clear(){active?.skipTransition();active=null;point=null;root.style.removeProperty('--dot-page-x');root.style.removeProperty('--dot-page-y');}

@@ -10,7 +10,7 @@ function setup(options={}){
  const location=new URL(options.url||'https://example.test/index.html');
  const document={documentElement:root,hidden:false,head:{append:s=>styles.push(s)},createElement:()=>({dataset:{},disabled:false}),querySelector:()=>options.controlOff?{}:null,addEventListener:(n,fn)=>docHandlers[n]=fn};
  if(!options.unsupported)document.startViewTransition=()=>{throw Error('Native link handling must not start a same-document transition');};
- const context={document,location,URL,URLSearchParams,innerWidth:1000,innerHeight:800,Date,Math,JSON,Promise,console,
+ const context={CSS:{registerProperty(){},supports(){return true;}},CSS:options.noCSS?undefined:{registerProperty:options.noRegistration?undefined:()=>{},supports:(feature)=>!(options.noMask&&feature==='mask-composite')&&!(options.noTypedSelector&&feature.startsWith('selector('))},document,location,URL,URLSearchParams,innerWidth:1000,innerHeight:800,Date,Math,JSON,Promise,console,
   matchMedia:()=>media,MutationObserver:class{constructor(fn){observer=fn}observe(){}},
   localStorage:{getItem:()=>{if(options.storageError)throw Error('denied');return options.localOff?'false':null;}},
   sessionStorage:{getItem:k=>{if(options.storageError)throw Error('denied');return store.get(k)||null;},setItem:(k,v)=>{if(options.storageError)throw Error('denied');store.set(k,v);},removeItem:k=>store.delete(k)},
@@ -29,6 +29,7 @@ function transition(){let resolve,reject;return{types:new Set(),ready:Promise.re
 const flush=async()=>{await Promise.resolve();await Promise.resolve();await Promise.resolve();};
 (async()=>{
  let h=setup({unsupported:true});assert.equal(h.styles.length,0);assert.equal(h.docHandlers.click,undefined);assert.equal(h.context.DotPageNavigation.motionOff(),false);
+ for(const feature of ['noCSS','noRegistration','noMask','noTypedSelector']){const fallback=setup({[feature]:true});assert.equal(fallback.styles.length,0,feature+' must leave native navigation untouched');assert.equal(fallback.docHandlers.click,undefined);}
  for(const options of [{reduced:true},{localOff:true},{controlOff:true},{url:'https://example.test/index.html?labMotion=off'}]){
   h=setup(options);assert.equal(h.context.DotPageNavigation.motionOff(),true);const t=transition();h.fire('pagereveal',{viewTransition:t});assert.equal(t.skips,1);t.resolve();
  }
@@ -52,6 +53,25 @@ const flush=async()=>{await Promise.resolve();await Promise.resolve();await Prom
   h=setup({store:new Map([[KEY,JSON.stringify({url:'https://example.test/index.html',off,time:Date.now(),point:{url:'https://example.test/index.html',x:.2,y:.3}})]])});t=transition();h.fire('pagereveal',{viewTransition:t});assert.equal(t.skips,off?1:0);t.resolve();await flush();assert.equal(h.props.size,0);
  }
  h=setup({store:new Map([[KEY,JSON.stringify({url:'https://example.test/index.html',off:true,time:Date.now()-20000})]])});t=transition();h.fire('pagereveal',{viewTransition:t});assert.equal(t.skips,0,'Expired motion handoff ignored');t.resolve();await flush();
+ // Four inherited numeric radii, not per-dot DOM/JS animation.
+ const css=setup().styles[0].textContent;
+ for(let i=0;i<4;i++){
+  assert.match(css,new RegExp('@property --dot-radius-'+i+'\\{syntax:"<length>";inherits:true;initial-value:0px\\}'));
+  assert.match(css,new RegExp('@keyframes dot-grid-'+i+'\\{from\\{--dot-radius-'+i+':0px\\}to\\{--dot-radius-'+i+':37px\\}\\}'));
+  assert.ok(css.includes('dot-grid-'+i+' 360ms cubic-bezier(.76,0,.18,1) '+(i*35)+'ms both'));
+ }
+ assert.ok(css.includes('mask-composite:intersect'));assert.ok(css.includes('mask-composite:add'));
+ assert.ok(css.includes('::view-transition-image-pair(root){background:#e5c54a;isolation:isolate;animation:'));
+ assert.ok(!/requestAnimationFrame|setInterval|setTimeout/.test(code),'No animation frame JS or timers');
+ // Each 96px tile has four centers, 48px apart. The farthest corner is
+ // sqrt(24^2+24^2); the new snapshot is fully opaque at radius 37-2=35.
+ const centers=[[24,24],[72,24],[24,72],[72,72]],opaqueRadius=37-2;
+ assert.ok(opaqueRadius>Math.hypot(24,24),'Opaque new mask must cover diagonal gaps');
+ for(let x=0;x<=96;x+=.5)for(let y=0;y<=96;y+=.5){
+  const d=Math.min(...centers.map(([cx,cy])=>Math.hypot(x-cx,y-cy)));
+  assert.ok(d<opaqueRadius,'New snapshot coverage gap at '+x+','+y);
+  assert.ok(d<37,'Old snapshot is completely removed at end');
+ }
  assert.ok(!/preventDefault\s*\(/.test(code));assert.ok(!/history\.(pushState|replaceState|go|back)\s*\(/.test(code));
  console.log('page-navigation: native semantics, motion preferences, capability fallback, cross-document handoff, Back, errors and cleanup passed');
 })().catch(e=>{console.error(e);process.exitCode=1;});
