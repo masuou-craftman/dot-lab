@@ -55,12 +55,22 @@ const flush=async()=>{await Promise.resolve();await Promise.resolve();await Prom
  h=setup({store:new Map([[KEY,JSON.stringify({url:'https://example.test/index.html',off:true,time:Date.now()-20000})]])});t=transition();h.fire('pagereveal',{viewTransition:t});assert.equal(t.skips,0,'Expired motion handoff ignored');t.resolve();await flush();
  // Coarse dot columns reveal only the new snapshot, leaving the old unchanged.
  for(const width of [320,375,390,768,1000,1440,1920,3840]){
-  const env=setup({width}),css=env.styles[0].textContent,columns=Math.max(4,Math.min(16,Math.ceil(width/112))),cell=width/columns,radius=Math.ceil(cell*Math.SQRT1_2)+2;
+  const env=setup({width}),css=env.styles[0].textContent,columns=Math.max(4,Math.min(16,Math.ceil(width/112))),cell=width/columns,radius=Math.ceil(cell*Math.SQRT1_2)+2,seed=Math.max(4,Math.round(cell*.07));
   assert.equal((css.match(/@property --dot-column-/g)||[]).length,columns);
+  assert.ok(seed>=4&&seed<radius,'Seed stays small and grows without reversing');
+  assert.ok(Math.abs((.38-.24)*360-50.4)<1e-9,'24–38% is a 50.4ms hold');
+  // Both Bezier y control points lie in [0,1], with monotonically increasing
+  // y(t)=3t²-2t³. Combined with nondecreasing radius stops there is no pulse back.
+  const bezier=(u,a,b)=>3*(1-u)*(1-u)*u*a+3*(1-u)*u*u*b+u*u*u;
+  function ease(progress){let lo=0,hi=1;for(let k=0;k<45;k++){const mid=(lo+hi)/2;if(bezier(mid,.65,.18)<progress)lo=mid;else hi=mid;}return bezier((lo+hi)/2,0,1);}
+  function radiusAt(t){if(t<.24)return seed*ease(t/.24);if(t<=.38)return seed;return seed+(radius-seed)*ease((t-.38)/.62);}
+  let previous=0;for(let ms=0;ms<=360;ms++){const r=radiusAt(ms/360);assert.ok(r+1e-9>=previous,'Reveal radius never shrinks');assert.ok(r>=0&&r<=radius+1e-9);previous=r;}
+  for(const t of [.24,.25,.3,.37,.38])assert.equal(radiusAt(t),seed,'Held seed is constant');
+  assert.ok(Math.abs(radiusAt(1)-radius)<1e-9,'Final radius reached');
   for(let i=0;i<columns;i++){
    assert.ok(css.includes(`@property --dot-column-${i}{syntax:"<length>";inherits:false;initial-value:0px}`));
-   assert.ok(css.includes(`@keyframes dot-column-${i}{from{--dot-column-${i}:0px}to{--dot-column-${i}:${radius}px}}`));
-   assert.ok(css.includes(`dot-column-${i} 360ms cubic-bezier(.4,0,.2,1) ${i*18}ms both`));
+   assert.ok(css.includes(`@keyframes dot-column-${i}{from{--dot-column-${i}:0px}24%,38%{--dot-column-${i}:${seed}px}to{--dot-column-${i}:${radius}px}}`));
+   assert.ok(css.includes(`dot-column-${i} 360ms cubic-bezier(.65,0,.18,1) ${i*18}ms both`));
   }
   assert.ok(css.includes(`animation-duration:${360+(columns-1)*18}ms;background:transparent`));
   assert.ok(css.includes('mask-repeat:repeat-y;mask-composite:add'));

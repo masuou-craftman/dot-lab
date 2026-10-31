@@ -19,15 +19,16 @@
  // The unchanged old snapshot stays behind the reveal; no white/black flash layer.
  const columns=Math.max(4,Math.min(16,Math.ceil(innerWidth/112)));
  const cell=innerWidth/columns, radius=Math.ceil(cell*Math.SQRT1_2)+2;
+ const seed=Math.max(4,Math.round(cell*.07)); // A small held dot, then one decisive opening.
  const duration=360+(columns-1)*18, scope=':root:active-view-transition-type(dot-page)';
  let css='@view-transition{navigation:auto}';
  const masks=[],sizes=[],positions=[],animations=[];
  for(let i=0;i<columns;i++){
   css+=`@property --dot-column-${i}{syntax:"<length>";inherits:false;initial-value:0px}`;
-  css+=`@keyframes dot-column-${i}{from{--dot-column-${i}:0px}to{--dot-column-${i}:${radius}px}}`;
+  css+=`@keyframes dot-column-${i}{from{--dot-column-${i}:0px}24%,38%{--dot-column-${i}:${seed}px}to{--dot-column-${i}:${radius}px}}`;
   masks.push(`radial-gradient(circle at ${i*cell+cell/2}px 50%,#000 var(--dot-column-${i}),transparent calc(var(--dot-column-${i}) + .7px))`);
   sizes.push(`${innerWidth}px ${cell}px`);positions.push(`0px 0px`);
-  animations.push(`dot-column-${i} 360ms cubic-bezier(.4,0,.2,1) ${i*18}ms both`);
+  animations.push(`dot-column-${i} 360ms cubic-bezier(.65,0,.18,1) ${i*18}ms both`);
  }
  css+=['','-group(*)','-image-pair(*)','-old(*)','-new(*)'].map(x=>scope+'::view-transition'+x).join(',')+'{pointer-events:none}';
  css+=`${scope}::view-transition-group(root){animation-duration:${duration}ms;background:transparent}`;
