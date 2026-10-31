@@ -8,7 +8,7 @@ const seeds=[0xD07,0xA11CE,0xBACC,0xC0FFEE],trace=[];let total=0;
 function checkTable(seed){const r=rng(seed),t=tableSetup();assert.equal(t.cells.length,14);let reduced=false;
  for(let i=0;i<512;i++){const op=r(12);trace.push({suite:'table',seed,step:i,op});if(trace.length>12)trace.shift();
  switch(op){case 0:t.cell(r(14)).dispatch('click');break;case 1:t.ids.replay.dispatch('click');break;case 2:t.location.hash=['#stroke-shape','#direction','#reading-focus','#heading','#invalid','#detail',''][r(7)];t.window('hashchange');break;case 3:t.location.hash=t.history.entries[r(t.history.entries.length)];t.window('popstate');break;case 4:t.ids['motion-toggle'].dispatch('click');break;case 5:reduced=!reduced;t.reduce(reduced);break;case 6:t.visibility(!t.document.hidden);break;case 7:t.window('pagehide');assert.equal(t.frames.size,0);assert.equal(t.live().length,0);t.window('pageshow');break;case 8:{const value=r(2)?'true':'false';t.storage.set('dotlab-motion-enabled',value);t.window('storage',{key:'dotlab-motion-enabled',newValue:value});break}case 9:t.advance(r(1500));break;case 10:t.cell(r(14)).dispatch('focus');break;case 11:t.ids[r(2)?'motion-toggle':'replay'].focus();break;}
- assert.equal(t.cells.filter(c=>c.attrs['aria-pressed']==='true').length,1);
+ assert.equal(t.cells.filter(c=>c.attrs['data-selected']==='true').length,1);
  assert.ok(t.frames.size<=1);assert.ok(t.live().length<=4);assert.ok(!(t.frames.size&&t.live().length));
  const off=t.ids['motion-toggle'].attrs['aria-pressed']==='false';if(t.document.hidden||reduced||off){assert.equal(t.frames.size,0);assert.equal(t.live().length,0)}
  const path=t.cell(8).querySelector('.a').getAttribute('points');assert.ok(path.split(/[ ,]+/).every(x=>Number.isFinite(Number(x))));

@@ -9,7 +9,7 @@ const vm=require('node:vm');
 const assert=require('node:assert/strict');
 const path=process.argv[2]||require('node:path').join(__dirname,'../dist/reading-focus.html');
 const html=fs.readFileSync(path,'utf8');
-const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
+const scripts=[...html.matchAll(/<script\b(?![^>]*\bsrc\s*=)[^>]*>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
 assert.equal(scripts.length,1,'Expected current standalone study to have one inline script');
 const source=scripts[0];
 new vm.Script(source,{filename:path});

@@ -272,46 +272,7 @@ html[data-boot=docking] .site-shell {opacity:1}
   .page-heading{grid-template-columns:minmax(0,1fr) 55px;gap:12px}.page-dot-symbol{width:55px;height:64px}.page-heading h1{font-size:25px}
 }
 
-/* A short central native rail, with a fine two-column dot thumb. */
-html{
-  --scroll-grip-dot:radial-gradient(circle,var(--ink) .85px,transparent 1.1px);
-}
-html::-webkit-scrollbar{width:12px;height:12px;background:var(--paper)}
-html::-webkit-scrollbar-track{
-  background-color:var(--paper);
-  background-image:radial-gradient(circle,var(--line) .5px,transparent .8px);
-  background-size:12px 4px;
-  background-position:center top;
-  background-repeat:repeat-y;
-}
-html::-webkit-scrollbar-track:vertical{
-  margin-top:max(16px,calc((100vh - 160px)/2));
-  margin-bottom:max(16px,calc((100vh - 160px)/2));
-}
-html::-webkit-scrollbar-thumb{
-  min-height:36px;
-  border:solid transparent;
-  border-width:0 2px;
-  border-radius:0;
-  background-color:var(--paper);
-  background-image:var(--scroll-grip-dot);
-  background-size:4px 4px;
-  background-position:center top;
-  background-repeat:repeat;
-  background-origin:padding-box;
-  background-clip:padding-box;
-}
-html::-webkit-scrollbar-button{display:none;width:0;height:0}
-html::-webkit-scrollbar-corner{background:var(--paper)}
-@supports not selector(::-webkit-scrollbar){
-  html{scrollbar-width:thin;scrollbar-color:var(--ink) var(--paper)}
-}
-@media(forced-colors:active){
-  html{scrollbar-color:auto}
-  html::-webkit-scrollbar-track,html::-webkit-scrollbar-thumb{background-image:none}
-  html::-webkit-scrollbar-track{background-color:Canvas}
-  html::-webkit-scrollbar-thumb{background-color:ButtonText}
-}
+/* Native rail and shared dot controls: dot-ui.css */
 
 .composition-work-art{position:relative;min-height:240px;background:#080808;overflow:hidden}.composition-work-art i{position:absolute;display:block;background:#eee;height:4px;width:45%;left:20%;top:25%}.composition-work-art i:nth-child(2){background:#fc0;width:33%;left:40%;top:40%}.composition-work-art i:nth-child(3){width:42%;left:25%;top:60%}.composition-work-art i:nth-child(4){width:24%;left:48%;top:75%}.composition-work-art b{position:absolute;top:46%;left:0;width:100%;text-align:center;color:#aaa;font:11px monospace;letter-spacing:.18em}.motion-work+.motion-work{margin-top:28px}</style><style>
 /* One low dot surface, repeated as a boundary and a closing mark. */
@@ -1065,7 +1026,7 @@ html[data-site-design=dot-lab][data-lab-motion=on][data-lab-easing=on] .dot-play
 </style>
 <style>
 .motion-work{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(24px,5vw,70px);align-items:center;background:#111;color:#f0f0f0;border:1px solid #333;border-radius:24px;padding:clamp(24px,4vw,48px);text-decoration:none;margin:28px 0}.motion-work{transition:border-color 220ms cubic-bezier(.16,1,.3,1)}.motion-work:hover{border-color:#a98c10}.motion-work-open b{display:inline-block;transition:transform 220ms cubic-bezier(.16,1,.3,1)}.motion-work:hover .motion-work-open b,.motion-work:focus-visible .motion-work-open b{transform:translate(3px,-3px)}@media(prefers-reduced-motion:reduce){.motion-work,.motion-work-open b{transition:none}.motion-work:hover .motion-work-open b,.motion-work:focus-visible .motion-work-open b{transform:none}}.motion-work:focus-visible{outline:2px solid #ffcc00;outline-offset:6px}.motion-work-art{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.motion-work-art span{aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;border:1px solid #555;font:clamp(20px,3vw,38px) 'Courier New',monospace;border-radius:3px;background:#090909}.motion-work-art span:first-child,.motion-work-art span:nth-child(6){color:#ffcc00;border-color:#a98c10}.motion-work-art span:nth-child(5){grid-column:auto}.motion-work-art small{position:absolute;top:6px;left:7px;color:#aaa;font:10px monospace}.motion-work-tag{font:10px/1.6 'Courier New',monospace;letter-spacing:.1em;color:#aaa}.motion-work-copy h2{font:500 clamp(25px,3vw,40px)/1.5 Arial,'Noto Sans CJK JP',sans-serif;margin:14px 0 18px}.motion-work-copy p{font-size:13px;line-height:2;color:#aaa}.motion-work-open{display:flex;justify-content:space-between;gap:24px;border-top:1px solid #444;margin-top:28px;padding-top:18px;font-size:13px}.motion-work-open b{font-size:22px;color:#ffcc00;font-weight:400}@media(max-width:640px){.motion-work{grid-template-columns:1fr}.motion-work-art{max-width:380px}.motion-work-art span{font-size:30px}}
-</style><link rel="stylesheet" href="design-edition.css"><link rel="stylesheet" href="dot-mix.css"></head>
+</style><link rel="stylesheet" href="design-edition.css"><link rel="stylesheet" href="dot-mix.css"><link rel="stylesheet" href="dot-ui.css?v=1"><script src="dot-ui.js?v=1" defer></script></head>
 <body>
 <a href="#main" class="skip">本文へ</a>
 <div class="site-shell">
