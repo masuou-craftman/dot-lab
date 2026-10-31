@@ -64,6 +64,16 @@ const flush=async()=>{await Promise.resolve();await Promise.resolve();await Prom
   }
   assert.ok(css.includes(`animation-duration:${360+(columns-1)*18}ms;background:transparent`));
   assert.ok(css.includes('mask-repeat:repeat-y;mask-composite:add'));
+  assert.ok(css.includes('mask-size:'+Array(columns).fill(`${width}px ${cell}px`).join(',')+';'),'Every mask spans viewport to avoid clipping at column seams');
+  assert.ok(css.includes('mask-position:'+Array(columns).fill('0px 0px').join(',')+';'),'Mask layers share the same origin');
+  const centers=[...css.matchAll(/radial-gradient\(circle at ([\d.]+)px 50%/g)].map(m=>Number(m[1]));assert.equal(centers.length,columns);for(let i=0;i<columns;i++)assert.ok(Math.abs(centers[i]-(i+.5)*cell)<1e-9,'Dots are centered by absolute column coordinate');
+  // At the end the union of viewport-wide circles covers every pixel, including
+  // viewport sides and former column seams; circle overlap is no longer clipped.
+  for(let x=0;x<=width;x+=Math.max(1,width/100))for(let y=0;y<=cell;y+=cell/20){
+   const nearest=Math.min(...Array.from({length:columns},(_,i)=>Math.hypot(x-(i+.5)*cell,y-cell/2)));
+   assert.ok(nearest<radius,'Viewport-wide masks must fully cover final snapshot');
+  }
+
   const oldRule=css.match(/::view-transition-old\(root\)\{([^}]+)\}/)[1];assert.equal(oldRule,'display:block;animation:none;mix-blend-mode:normal');
   assert.ok(!css.includes('#e5c54a'),'No accent flash/background');assert.ok(!css.includes('mask-composite:intersect'));
   assert.ok(radius>Math.hypot(cell/2,cell/2),'Every square column tile must be opaque by the end');

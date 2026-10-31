@@ -25,8 +25,8 @@
  for(let i=0;i<columns;i++){
   css+=`@property --dot-column-${i}{syntax:"<length>";inherits:false;initial-value:0px}`;
   css+=`@keyframes dot-column-${i}{from{--dot-column-${i}:0px}to{--dot-column-${i}:${radius}px}}`;
-  masks.push(`radial-gradient(circle,#000 var(--dot-column-${i}),transparent calc(var(--dot-column-${i}) + .7px))`);
-  sizes.push(`${cell}px ${cell}px`);positions.push(`${i*cell}px 0px`);
+  masks.push(`radial-gradient(circle at ${i*cell+cell/2}px 50%,#000 var(--dot-column-${i}),transparent calc(var(--dot-column-${i}) + .7px))`);
+  sizes.push(`${innerWidth}px ${cell}px`);positions.push(`0px 0px`);
   animations.push(`dot-column-${i} 360ms cubic-bezier(.4,0,.2,1) ${i*18}ms both`);
  }
  css+=['','-group(*)','-image-pair(*)','-old(*)','-new(*)'].map(x=>scope+'::view-transition'+x).join(',')+'{pointer-events:none}';
