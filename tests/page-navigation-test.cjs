@@ -68,7 +68,7 @@ const flush=async()=>{await Promise.resolve();await Promise.resolve();await Prom
   for(const t of [.24,.25,.3,.37,.38])assert.ok(radiusAt(t+.001)>radiusAt(t),'No former hold-range plateau');
   assert.equal(radiusAt(1),radius,'Final radius reached');
   for(let i=0;i<columns;i++){
-   assert.ok(css.includes(`@property --dot-column-${i}{syntax:"<length>";inherits:false;initial-value:0px}`));
+   assert.ok(css.includes(`@property --dot-column-${i}{syntax:"<length>";inherits:false;initial-value:${radius}px}`));
    assert.ok(css.includes(`@keyframes dot-column-${i}{from{--dot-column-${i}:0px}to{--dot-column-${i}:${radius}px}}`));
    assert.ok(css.includes(`dot-column-${i} 360ms cubic-bezier(.25,.25,.45,1) ${i*18}ms both`));
   }
@@ -87,6 +87,9 @@ const flush=async()=>{await Promise.resolve();await Promise.resolve();await Prom
   const oldRule=css.match(/::view-transition-old\(root\)\{([^}]+)\}/)[1];assert.equal(oldRule,'display:block;animation:none;mix-blend-mode:normal');
   assert.ok(!css.includes('#e5c54a'),'No accent flash/background');assert.ok(!css.includes('mask-composite:intersect'));
   assert.ok(radius>Math.hypot(cell/2,cell/2),'Every square column tile must be opaque by the end');
+  // Teardown/cancellation fallback must be fully revealed, not reset to zero.
+  const defaults=[...css.matchAll(/@property --dot-column-\d+\{[^}]*initial-value:([\d.]+)px/g)].map(m=>+m[1]);
+  assert.equal(defaults.length,columns);assert.ok(defaults.every(r=>r>Math.hypot(cell/2,cell/2)),'Underlying radii cover all pixels when animation contribution is removed');
   for(let x=0;x<=20;x++)for(let y=0;y<=20;y++)assert.ok(Math.hypot(cell*(x/20-.5),cell*(y/20-.5))<radius);
   assert.ok(columns<=16,'Bound mask and animated property counts');
   const vt=transition();env.fire('pagereveal',{viewTransition:vt});env.context.innerWidth=width+100;env.fire('resize');assert.ok(env.styles[0].disabled);assert.ok(vt.skips>0);assert.equal(env.props.size,0);env.fire('pageshow');assert.ok(env.styles[0].disabled,'Width mismatch stays disabled after pageshow');vt.resolve();await flush();
