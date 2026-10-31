@@ -14,9 +14,9 @@
  if(!('onpageswap' in window)||!('onpagereveal' in window)||!document.startViewTransition)return;
  const style=document.createElement('style');style.dataset.dotPageNavigation='';
  style.textContent=`@view-transition{navigation:auto}
- :root:active-view-transition-type(dot-page)::view-transition{pointer-events:none}
+ :root:active-view-transition-type(dot-page)::view-transition, :root:active-view-transition-type(dot-page)::view-transition-group(*), :root:active-view-transition-type(dot-page)::view-transition-image-pair(*), :root:active-view-transition-type(dot-page)::view-transition-old(*), :root:active-view-transition-type(dot-page)::view-transition-new(*){pointer-events:none}
  :root:active-view-transition-type(dot-page)::view-transition-group(root){animation-duration:340ms}
- :root:active-view-transition-type(dot-page)::view-transition-old(root){animation:none;mix-blend-mode:normal}
+ :root:active-view-transition-type(dot-page)::view-transition-old(root){display:block;animation:none;mix-blend-mode:normal}
  :root:active-view-transition-type(dot-page)::view-transition-new(root){mix-blend-mode:normal;animation:dot-page-open 340ms cubic-bezier(.76,0,.18,1) both}
  @keyframes dot-page-open{from{clip-path:circle(5px at var(--dot-page-x,50vw) var(--dot-page-y,42vh))}to{clip-path:circle(150vmax at var(--dot-page-x,50vw) var(--dot-page-y,42vh))}}
  @media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-new(*),::view-transition-old(*){animation:none!important}}`;
